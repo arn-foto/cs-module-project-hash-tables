@@ -16,12 +16,13 @@ class HashTable:
     """
     A hash table that with `capacity` buckets
     that accepts string keys
-
     Implement this.
     """
 
     def __init__(self, capacity):
         # Your code here
+        self.capacity = capacity
+        self.storage = [None] * capacity
 
 
     def get_num_slots(self):
@@ -29,18 +30,15 @@ class HashTable:
         Return the length of the list you're using to hold the hash
         table data. (Not the number of items stored in the hash table,
         but the number of slots in the main list.)
-
         One of the tests relies on this.
-
         Implement this.
         """
         # Your code here
-
+        return len(self.storage)
 
     def get_load_factor(self):
         """
         Return the load factor for this hash table.
-
         Implement this.
         """
         # Your code here
@@ -49,17 +47,26 @@ class HashTable:
     def fnv1(self, key):
         """
         FNV-1 Hash, 64-bit
-
         Implement this, and/or DJB2.
         """
-
         # Your code here
+        #Constants
+        FNV_prime = 1099511628211
+        offset_basis = 14695981039346656037
+
+        #FNV-1a Hash Function
+        hash = offset_basis 
+
+        for char in key:
+            hash = hash * FNV_prime
+            hash = hash ^ ord(char)
+
+        return hash
 
 
     def djb2(self, key):
         """
         DJB2 hash, 32-bit
-
         Implement this, and/or FNV-1.
         """
         # Your code here
@@ -70,47 +77,56 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
-        return self.djb2(key) % self.capacity
+        return self.fnv1(key) % self.capacity
+        # return self.djb2(key) % self.capacity
 
     def put(self, key, value):
         """
         Store the value with the given key.
-
         Hash collisions should be handled with Linked List Chaining.
-
         Implement this.
+        O(n) over the length (number of bytes) of the key
+	    O(1) over the number of items in the table
         """
         # Your code here
-
+        index = self.hash_index(key)
+        self.storage[index] = HashTableEntry(key, value)
 
     def delete(self, key):
         """
         Remove the value stored with the given key.
-
         Print a warning if the key is not found.
-
         Implement this.
         """
         # Your code here
+        index = self.hash_index(key)
+        
+        if self.storage[index]:
+            self.storage[index] = None
+        else:
+            print(f'{key} is not found in the hash table')
 
 
     def get(self, key):
         """
         Retrieve the value stored with the given key.
-
         Returns None if the key is not found.
-
         Implement this.
         """
         # Your code here
+        index = self.hash_index(key)
+        hash_entry = self.storage[index]
+
+        if hash_entry:
+            return hash_entry.value
+        else:
+            return None
 
 
     def resize(self, new_capacity):
         """
         Changes the capacity of the hash table and
         rehashes all key/value pairs.
-
         Implement this.
         """
         # Your code here
